@@ -378,7 +378,7 @@ class OrderedSentenceGenerator implements GeneratorStrategy{
         // Convert the word into lower case
         word = word.toUpperCase();
         String reverseWord = "";
-        for(int i=0; i<word.length(); i++){
+        for(int i=word.length()-1; i>=0; i--){
             reverseWord = reverseWord.concat(String.valueOf(word.charAt(i)));
         }
         return reverseWord;
