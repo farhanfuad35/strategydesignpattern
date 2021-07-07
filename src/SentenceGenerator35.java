@@ -7,146 +7,196 @@ import java.lang.Math;
 public class SentenceGenerator35 {
 
     public static void main(String[] args){
-        while(Menu.displayOperationPrompt());
+        while(Menu.chooseStringGenerator());
     }
 
 }
 
 class Menu {
-    private static final String[] operations1 = {
+    private static final String[] generators = {
             "Random Sentence Generator",
             "Sorted Sentence Generator",
             "Ordered Sentence Generator",
             "Exit"
     };
 
-    private static final String[] operations2 = {
+    private static final String[] operations = {
             "Add a word to the vocabulary",
             "Generate a sentence",
             "Back"
     };
 
-    public static boolean displayOperationPrompt() {
-        for (int i = 1; i <= operations1.length; i++) {
-            System.out.printf("%d. %s\n", i, operations1[i - 1]);
+    // This method displays a prompt to the users and let them select the desired generator
+    // Return true if "choose generator" prompt should be displayed again
+    // Return false to exit the program
+    public static boolean chooseStringGenerator() {
+
+        // Display the list of string generators
+        for (int i = 1; i <= generators.length; i++) {
+            System.out.printf("%d. %s\n", i, generators[i - 1]);
         }
         System.out.println("Please choose an option:");
 
+
         try {
+            // Takes user input
             Scanner sc = new Scanner(System.in);
             int operationID = sc.nextInt();
 
+            // User wants to exit
             if(operationID == 4){
                 return false;
             }
 
+            // Wrong operation number inserted
             if(operationID > 4 || operationID < 1) {
                 System.out.println("Please enter a valid number\n");
                 return true;
             }
 
-            // Because operations is numbered from 1 to the user, but stored from 0
-            executeOperation(operationID-1);
+            // Proper operation has been selected
+            System.out.println("-------------------------------------");
+            // Original array index and user input differ by 1 since arrays start from 0
+            System.out.println(generators[operationID-1] + " Selected\n");
 
+            // All string generation operations are executed through StringGenerator class by the client
+            StringGenerator stringGenerator = new StringGenerator();
+
+            // Random sentence generator requested
+            if(operationID == 1){
+                GeneratorStrategy generatorStrategy = new RandomSentenceGenerator();
+                stringGenerator.setGeneratorStrategy(generatorStrategy);
+            }
+            // Sorted sentence generator requested
+            else if(operationID == 2){
+                GeneratorStrategy generatorStrategy = new SortedSentenceGenerator();
+                stringGenerator.setGeneratorStrategy(generatorStrategy);
+            }
+            // Ordered sentence generator requested
+            else{
+                GeneratorStrategy generatorStrategy = new OrderedSentenceGenerator();
+                stringGenerator.setGeneratorStrategy(generatorStrategy);
+            }
+
+            // Keep showing the "Add or Generate" until user wants to go back to the previous menu
+            while(chooseAddOrGenerate(stringGenerator));
+
+            // Return true to show the Generator selection prompt again
             return true;
-        } catch (InputMismatchException exception){
+        }
+        // Handles exception in case user enters a String instead of an integer at the "choose generator" prompt
+        catch (InputMismatchException exception){
             System.out.println("Please enter a valid number\n");
             return true;
         }
     }
 
-
-     static boolean displayAddOrGeneratePrompt(GeneratorStrategy generatorStrategy){
-        for (int i = 1; i <= operations2.length; i++) {
-         System.out.printf("%d. %s\n", i, operations2[i - 1]);
+    // This method lets the users choose what to do with the generator: 1) Add word to the vocabulary
+    // or 2) Generate a new sentence
+    // Return true if the user wants to try the generator again
+    // Return false if the user wants to go back to the previous menu
+    static boolean chooseAddOrGenerate(StringGenerator stringGenerator){
+        // Display the selection prompt
+        for (int i = 1; i <= operations.length; i++) {
+            System.out.printf("%d. %s\n", i, operations[i - 1]);
         }
 
+        // There is an user input method here which can throw InputMismatchException in case the user input
+        // is not an integer as expected
         try {
+            // Takes user input
             Scanner sc = new Scanner(System.in);
             int operationID = sc.nextInt();
 
+            // User wants to add a word to the vocabulary
             if (operationID == 1) {
                 System.out.println("Please enter a word to be add to the vocabulary:");
                 sc.nextLine();
                 String word = sc.nextLine();
-                generatorStrategy.addToVocabulary(word);
-            } else if (operationID == 2) {
-                String sentence = generatorStrategy.generate();
+                stringGenerator.executeVocabularyAddition(word);
+            }
+            // User wants to generate a sentence
+            else if (operationID == 2) {
+                String sentence = stringGenerator.executeStringGeneration();
                 System.out.println(sentence);
-            } else {
+            }
+            // User wants to go back to the previous menu
+            else if(operationID == 3){
                 return false;
             }
+            // User inserted an invalid operation number
+            else{
+                System.out.println("Please enter a valid number.\n");
+                return true;
+            }
 
+            // Show the "Add or Generate String" prompt again
             return true;
         } catch (InputMismatchException exception){
-            System.out.println("Please enter a valid number\n");
+            System.out.println("Please enter a valid number.\n");
             return true;
         }
-    }
-
-
-    private static void executeOperation(int operationID) {
-        System.out.println("-------------------------------------");
-        System.out.println(operations1[operationID] + " Selected\n");
-
-        StringGenerator stringGenerator = new StringGenerator();
-        GeneratorStrategy generatorStrategy;
-
-        if(operationID == 0){
-            // Random sentence generator requested
-            generatorStrategy = new RandomSentenceGenerator();
-            stringGenerator.setGeneratorStrategy(generatorStrategy);
-        }
-        else if(operationID == 1){
-            // Sorted sentence generator requested
-            generatorStrategy = new SortedSentenceGenerator();
-            stringGenerator.setGeneratorStrategy(generatorStrategy);
-        }
-        else{
-            // Ordered sentence generator requested
-            generatorStrategy = new OrderedSentenceGenerator();
-            stringGenerator.setGeneratorStrategy(generatorStrategy);
-        }
-
-        while(displayAddOrGeneratePrompt(generatorStrategy));
     }
 }
 
-
+// This class behaves as the context class of the Strategy Design Pattern
+// It is responsible for executing the strategy on the client's request and
+// is not really aware of all the strategies available (RSG, SSG, OSG). Rather
+// the class operates on a common interface for all the strategies - Generator Strategy.
 class StringGenerator{
-    private GeneratorStrategy generatorStrategy;
+    // To hold the strategy set by the client
+    GeneratorStrategy generatorStrategy;
 
+    // Method to let the client set the strategy
     public void setGeneratorStrategy(GeneratorStrategy generatorStrategy){
         this.generatorStrategy = generatorStrategy;
     }
 
-    public String generateSentence(){
-        return generatorStrategy.generate();
+    // This method is responsible for actually generating the sentence using the interface
+    // and also printing them
+    public String executeStringGeneration(){
+       try {
+           ArrayList<String> words = generatorStrategy.prepareWords();
+           String generatedSentence = generatorStrategy.concatenate(words);
+
+           if(words == null || generatedSentence == null)
+               throw new NullPointerException();
+
+           return generatedSentence;
+       } catch (NullPointerException exception){
+           return "";
+       }
+    }
+
+    // This method is responsible for adding a word to the vocabulary of the generator set previously
+    public void executeVocabularyAddition(String word){
+       String formattedWord = generatorStrategy.setCaseAndFormat(word);
+       generatorStrategy.addToVocabulary(formattedWord);
     }
 }
 
+// Interface for all the different string generator strategies available.
+// Interface allows StringGenerator class to work independently without the need to
+// know what type of generator actually is being executed. This makes it easier to add
+// new generator in future and requires no additional change in the StringGenerator class
 interface GeneratorStrategy{
-    String generate();
+
+    // To prepare a list of words from the vocabulary as needed by a specific generator algorithm
     ArrayList<String> prepareWords();
+
+    // Concatenates the words generated by the prepareWords() method
     String concatenate(ArrayList<String> words);
-    void addToVocabulary(String word);
+
+    // Sets the case and format before saving to the vocabulary as needed by a particular algorithm
     String setCaseAndFormat(String word);
+
+    // Add the formatted word word to the vocabulary
+    void addToVocabulary(String formattedWord);
+
 }
 
 class RandomSentenceGenerator implements GeneratorStrategy{
     private static ArrayList<String> vocabulary = new ArrayList<>();
-
-    @Override
-    public String generate() {
-        try {
-            ArrayList<String> words = prepareWords();
-            String generatedSentence = concatenate(words);
-
-            return generatedSentence;
-        } catch (NullPointerException exception){
-            return "";
-        }
-    }
 
     @Override
     public ArrayList<String> prepareWords()
@@ -159,16 +209,16 @@ class RandomSentenceGenerator implements GeneratorStrategy{
 
         try {
             for (int i = 0; i < numberOfWords; i++) {
-                int randomIndex = (int) ((Math.random() * 100000000) % numberOfWords);
+                int randomIndex = (int) ((Math.random() * 100000000) % vocabulary.size());
                 words.add(vocabulary.get(randomIndex));
             }
 
             return words;
         } catch (IndexOutOfBoundsException exception){
             if(vocabulary.isEmpty())
-                System.out.println("Vocabulary is empty. Please try adding some words first.");
+                System.out.println("Vocabulary is empty. Please try adding some words first. ");
             else
-                System.out.println("Exception Occurred: Vocabulary index out of bound.");
+                System.out.println("Exception Occurred: Vocabulary index out of bound." + exception.getLocalizedMessage());
 
             return null;
         }
@@ -184,23 +234,21 @@ class RandomSentenceGenerator implements GeneratorStrategy{
 
             return sentence;
         } catch (IndexOutOfBoundsException exception){
-            System.out.println("Exception occurred: The word list array is empty!");
+            System.out.println("Exception occurred: The word list array is empty! ");
             return null;
         }
     }
 
     @Override
-    public void addToVocabulary(String word) {
+    public String setCaseAndFormat(String word) {
         // Convert the word into lower case
-        word = setCaseAndFormat(word);
-
-        vocabulary = getVocabulary();
-        vocabulary.add(word);
+        return word.toLowerCase();
     }
 
     @Override
-    public String setCaseAndFormat(String word) {
-        return word.toLowerCase();
+    public void addToVocabulary(String formattedWord) {
+        vocabulary = getVocabulary();
+        vocabulary.add(formattedWord);
     }
 
     // Special getter method is needed since static field needs a static method to be accessed
@@ -213,18 +261,6 @@ class SortedSentenceGenerator implements GeneratorStrategy{
     private static ArrayList<String> vocabulary = new ArrayList<>();
 
     @Override
-    public String generate() {
-        try {
-            ArrayList<String> words = prepareWords();
-            String generatedSentence = concatenate(words);
-
-            return generatedSentence;
-        } catch (NullPointerException exception){
-            return "";
-        }
-    }
-
-    @Override
     public ArrayList<String> prepareWords() {
         ArrayList<String> vocabulary = getVocabulary();
 
@@ -235,7 +271,7 @@ class SortedSentenceGenerator implements GeneratorStrategy{
 
         try {
             for (int i = 0; i < numberOfWords; i++) {
-                int randomIndex = (int) ((Math.random() * 100000000) % numberOfWords);
+                int randomIndex = (int) ((Math.random() * 100000000) % vocabulary.size());
                 words.add(vocabulary.get(randomIndex));
             }
 
@@ -247,7 +283,7 @@ class SortedSentenceGenerator implements GeneratorStrategy{
             if(vocabulary.isEmpty())
                 System.out.println("Vocabulary is empty. Please try adding some words first.");
             else
-                System.out.println("Exception Occurred: Vocabulary index out of bound.");
+                System.out.println("Exception Occurred: Vocabulary index out of bound. " + exception.getLocalizedMessage());
 
             return null;
         }
@@ -269,18 +305,18 @@ class SortedSentenceGenerator implements GeneratorStrategy{
     }
 
     @Override
-    public void addToVocabulary(String word) {
+    public String setCaseAndFormat(String word) {
         // Convert the word into lower case
-        word = setCaseAndFormat(word);
 
-        vocabulary = getVocabulary();
-        vocabulary.add(word);
+        return word.toLowerCase();
     }
 
     @Override
-    public String setCaseAndFormat(String word) {
-        return word.toLowerCase();
+    public void addToVocabulary(String formattedWord) {
+        vocabulary = getVocabulary();
+        vocabulary.add(formattedWord);
     }
+
 
     // Special getter method is needed since static field needs a static method to be accessed
     public static ArrayList<String> getVocabulary() {
@@ -290,18 +326,6 @@ class SortedSentenceGenerator implements GeneratorStrategy{
 
 class OrderedSentenceGenerator implements GeneratorStrategy{
     private static ArrayList<String> vocabulary = new ArrayList<>();
-
-    @Override
-    public String generate() {
-        try {
-            ArrayList<String> words = prepareWords();
-            String generatedSentence = concatenate(words);
-
-            return generatedSentence;
-        } catch (NullPointerException exception){
-            return "";
-        }
-    }
 
     @Override
     public ArrayList<String> prepareWords() {
@@ -331,22 +355,20 @@ class OrderedSentenceGenerator implements GeneratorStrategy{
     }
 
     @Override
-    public void addToVocabulary(String word) {
-        // Convert the word into lower case
-        word = setCaseAndFormat(word);
-
-        vocabulary = getVocabulary();
-        vocabulary.add(word);
-    }
-
-    @Override
     public String setCaseAndFormat(String word) {
+        // Convert the word into lower case
         word = word.toUpperCase();
         String reverseWord = "";
         for(int i=0; i<word.length(); i++){
             reverseWord = reverseWord.concat(String.valueOf(word.charAt(i)));
         }
         return reverseWord;
+    }
+
+    @Override
+    public void addToVocabulary(String formattedWord) {
+        vocabulary = getVocabulary();
+        vocabulary.add(formattedWord);
     }
 
     // Special getter method is needed since static field needs a static method to be accessed
