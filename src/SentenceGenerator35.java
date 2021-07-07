@@ -30,7 +30,7 @@ class Menu {
     // This method displays a prompt to the users and let them select the desired generator
     // Return true if "choose generator" prompt should be displayed again
     // Return false to exit the program
-    public static boolean chooseStringGenerator() {
+    static boolean chooseStringGenerator() {
 
         // Display the list of string generators
         for (int i = 1; i <= generators.length; i++) {
@@ -54,6 +54,9 @@ class Menu {
                 System.out.println("Please enter a valid number\n");
                 return true;
             }
+
+
+            // ------------------------------------------------------------------------------
 
             // Proper operation has been selected
             System.out.println("-------------------------------------");
@@ -154,7 +157,6 @@ class StringGenerator{
     }
 
     // This method is responsible for actually generating the sentence using the interface
-    // and also printing them
     public String executeStringGeneration(){
        try {
            ArrayList<String> words = generatorStrategy.prepareWords();
@@ -195,6 +197,11 @@ interface GeneratorStrategy{
     void addToVocabulary(String formattedWord);
 
 }
+
+/*
+    Random Sentence Generator generates a sentence formed by random words from its vocabulary.
+    Each word is converted to lowercase before adding to the vocabulary.
+ */
 
 class RandomSentenceGenerator implements GeneratorStrategy{
 
@@ -263,6 +270,13 @@ class RandomSentenceGenerator implements GeneratorStrategy{
         return vocabulary;
     }
 }
+
+/*
+    Sorted Sentence Generator generates a sentence formed by random words from its vocabulary.
+    But then the chosen words are sorted unlike the previous generator. Only after the words are
+    concatenated to form a sentence.
+    Each word is converted to lowercase before adding to the vocabulary.
+ */
 
 class SortedSentenceGenerator implements GeneratorStrategy{
 
@@ -335,6 +349,12 @@ class SortedSentenceGenerator implements GeneratorStrategy{
     }
 }
 
+
+/*
+    Ordered Sentence Generator generates a sentence formed by concatenating all of the words from
+    its vocabulary in the order they were inserted.
+    Each word is converted to UPPERCASE and reversed before adding to the vocabulary.
+ */
 class OrderedSentenceGenerator implements GeneratorStrategy{
 
     // To hold the vocabulary for this generator
@@ -377,6 +397,8 @@ class OrderedSentenceGenerator implements GeneratorStrategy{
     public String setCaseAndFormat(String word) {
         // Convert the word into lower case
         word = word.toUpperCase();
+
+        // Reverse the word
         String reverseWord = "";
         for(int i=word.length()-1; i>=0; i--){
             reverseWord = reverseWord.concat(String.valueOf(word.charAt(i)));
