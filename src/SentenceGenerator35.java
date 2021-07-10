@@ -51,8 +51,7 @@ class Menu {
 
             // Wrong operation number inserted
             if(operationID > 4 || operationID < 1) {
-                System.out.println("Please enter a valid number\n");
-                return true;
+                throw new InputMismatchException();
             }
 
 
@@ -68,18 +67,15 @@ class Menu {
 
             // Random sentence generator requested
             if(operationID == 1){
-                GeneratorStrategy generatorStrategy = new RandomSentenceGenerator();
-                stringGenerator.setGeneratorStrategy(generatorStrategy);
+                stringGenerator.setGeneratorStrategy(new RandomSentenceGenerator());
             }
             // Sorted sentence generator requested
             else if(operationID == 2){
-                GeneratorStrategy generatorStrategy = new SortedSentenceGenerator();
-                stringGenerator.setGeneratorStrategy(generatorStrategy);
+                stringGenerator.setGeneratorStrategy(new SortedSentenceGenerator());
             }
             // Ordered sentence generator requested
             else{
-                GeneratorStrategy generatorStrategy = new OrderedSentenceGenerator();
-                stringGenerator.setGeneratorStrategy(generatorStrategy);
+                stringGenerator.setGeneratorStrategy(new OrderedSentenceGenerator());
             }
 
             // Keep showing the "Add or Generate" until user wants to go back to the previous menu
@@ -149,7 +145,7 @@ class Menu {
 // the class operates on a common interface for all the strategies - Generator Strategy.
 class StringGenerator{
     // To hold the strategy set by the client
-    GeneratorStrategy generatorStrategy;
+    private GeneratorStrategy generatorStrategy;
 
     // Method to let the client set the strategy
     public void setGeneratorStrategy(GeneratorStrategy generatorStrategy){
