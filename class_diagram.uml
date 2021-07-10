@@ -3,82 +3,79 @@
   <ID>JAVA</ID>
   <OriginalElement>/mnt/NoChill/CSEDU/3-2/Software Design Pattern/Strategy Pattern/src/SentenceGenerator35.java</OriginalElement>
   <nodes>
-    <node x="555.0" y="-87.0">GeneratorStrategy</node>
-    <node x="555.0" y="123.0">OrderedSentenceGenerator</node>
-    <node x="-265.0" y="147.0">StringGenerator</node>
-    <node x="31.008333333333326" y="523.0">SentenceGenerator35</node>
-    <node x="520.0" y="444.5">Menu</node>
-    <node x="887.0" y="123.0">SortedSentenceGenerator</node>
-    <node x="223.0" y="123.0">RandomSentenceGenerator</node>
+    <node x="612.0" y="-59.0">GeneratorStrategy</node>
+    <node x="986.0" y="116.0">OrderedSentenceGenerator</node>
+    <node x="1046.3333333333333" y="542.0">SentenceGenerator35</node>
+    <node x="-116.0" y="128.0">SentenceGeneratorContext</node>
+    <node x="543.5" y="477.0">Menu</node>
+    <node x="612.0" y="206.0">RandomSentenceGenerator</node>
+    <node x="262.0" y="116.0">SortedSentenceGenerator</node>
   </nodes>
   <notes />
   <edges>
     <edge source="SortedSentenceGenerator" target="GeneratorStrategy" relationship="REALIZATION">
       <point x="0.0" y="-90.5" />
-      <point x="1023.5" y="24.0" />
-      <point x="782.5" y="24.0" />
+      <point x="398.5" y="47.0" />
+      <point x="839.5" y="47.0" />
       <point x="91.0" y="66.0" />
     </edge>
     <edge source="Menu" target="OrderedSentenceGenerator" relationship="CREATE">
-      <point x="42.875" y="-66.5" />
-      <point x="691.5" y="444.5" />
+      <point x="153.75" y="-66.5" />
+      <point x="902.25" y="515.0" />
+      <point x="1122.5" y="515.0" />
       <point x="0.0" y="90.5" />
     </edge>
-    <edge source="StringGenerator" target="GeneratorStrategy" relationship="TO_ONE">
-      <point x="-82.0" y="-66.5" />
-      <point x="-183.0" y="-61.0" />
-      <point x="600.5" y="-61.0" />
+    <edge source="SentenceGeneratorContext" target="GeneratorStrategy" relationship="DEPENDENCY">
+      <point x="-82.0" y="-78.5" />
+      <point x="-34.0" y="-34.0" />
+      <point x="657.5" y="-34.0" />
       <point x="-91.0" y="66.0" />
     </edge>
-    <edge source="StringGenerator" target="GeneratorStrategy" relationship="DEPENDENCY">
-      <point x="82.0" y="-66.5" />
-      <point x="-19.0" y="-21.0" />
-      <point x="691.5" y="-21.0" />
-      <point x="0.0" y="66.0" />
-    </edge>
     <edge source="Menu" target="SortedSentenceGenerator" relationship="CREATE">
-      <point x="128.625" y="-66.5" />
-      <point x="820.125" y="393.0" />
-      <point x="1023.5" y="393.0" />
+      <point x="-51.25" y="-66.5" />
+      <point x="697.25" y="515.0" />
+      <point x="398.5" y="515.0" />
       <point x="0.0" y="90.5" />
     </edge>
     <edge source="Menu" target="RandomSentenceGenerator" relationship="CREATE">
-      <point x="-42.875" y="-66.5" />
-      <point x="648.625" y="478.0" />
-      <point x="562.875" y="478.0" />
-      <point x="562.875" y="383.0" />
-      <point x="359.5" y="383.0" />
+      <point x="51.25" y="-66.5" />
+      <point x="799.75" y="515.0" />
+      <point x="748.5" y="515.0" />
       <point x="0.0" y="90.5" />
     </edge>
     <edge source="OrderedSentenceGenerator" target="GeneratorStrategy" relationship="REALIZATION">
       <point x="0.0" y="-90.5" />
-      <point x="691.5" y="38.0" />
-      <point x="782.5" y="38.0" />
+      <point x="1122.5" y="47.0" />
+      <point x="839.5" y="47.0" />
       <point x="91.0" y="66.0" />
     </edge>
     <edge source="SentenceGenerator35" target="Menu" relationship="DEPENDENCY">
       <point x="0.0" y="-30.0" />
-      <point x="140.50833333333333" y="571.0" />
-      <point x="691.5" y="571.0" />
+      <point x="1155.8333333333333" y="571.0" />
+      <point x="748.5" y="571.0" />
       <point x="0.0" y="66.5" />
     </edge>
     <edge source="RandomSentenceGenerator" target="GeneratorStrategy" relationship="REALIZATION">
       <point x="0.0" y="-90.5" />
-      <point x="359.5" y="24.0" />
-      <point x="782.5" y="24.0" />
+      <point x="748.5" y="-16.0" />
+      <point x="839.5" y="-16.0" />
       <point x="91.0" y="66.0" />
     </edge>
-    <edge source="Menu" target="StringGenerator" relationship="CREATE">
-      <point x="-128.625" y="-66.5" />
-      <point x="562.875" y="482.0" />
-      <point x="-101.0" y="482.0" />
-      <point x="0.0" y="66.5" />
+    <edge source="SentenceGeneratorContext" target="GeneratorStrategy" relationship="TO_ONE">
+      <point x="82.0" y="-78.5" />
+      <point x="130.0" y="12.0" />
+      <point x="748.5" y="12.0" />
+      <point x="0.0" y="66.0" />
+    </edge>
+    <edge source="Menu" target="SentenceGeneratorContext" relationship="CREATE">
+      <point x="-153.75" y="-66.5" />
+      <point x="594.75" y="554.0" />
+      <point x="48.0" y="554.0" />
+      <point x="0.0" y="78.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic" zoom="1.0" showDependencies="true" x="411.5" y="262.0" />
-  <SelectedNodes>
-    <node>SentenceGenerator35</node>
-  </SelectedNodes>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="true" x="618.0" y="295.0" />
+  <SelectedNodes />
   <Categories>
     <Category>Fields</Category>
     <Category>Methods</Category>
