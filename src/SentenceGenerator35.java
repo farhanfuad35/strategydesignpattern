@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.InputMismatchException;
@@ -6,6 +5,7 @@ import java.util.Scanner;
 import java.lang.Math;
 
 public class SentenceGenerator35 {
+    public final static int MAX_NUMBER_OF_WORDS = 30;
 
     public static void main(String[] args){
         while(Menu.chooseStringGenerator());
@@ -63,23 +63,23 @@ class Menu {
             System.out.println(generators[operationID-1] + " Selected\n");
 
             // All string generation operations are executed through StringGenerator class by the client
-            StringGenerator stringGenerator = new StringGenerator();
+            SentenceGeneratorContext sentenceGeneratorContext = new SentenceGeneratorContext();
 
             // Random sentence generator requested
             if(operationID == 1){
-                stringGenerator.setGeneratorStrategy(new RandomSentenceGenerator());
+                sentenceGeneratorContext.setGeneratorStrategy(new RandomSentenceGenerator());
             }
             // Sorted sentence generator requested
             else if(operationID == 2){
-                stringGenerator.setGeneratorStrategy(new SortedSentenceGenerator());
+                sentenceGeneratorContext.setGeneratorStrategy(new SortedSentenceGenerator());
             }
             // Ordered sentence generator requested
             else{
-                stringGenerator.setGeneratorStrategy(new OrderedSentenceGenerator());
+                sentenceGeneratorContext.setGeneratorStrategy(new OrderedSentenceGenerator());
             }
 
             // Keep showing the "Add or Generate" until user wants to go back to the previous menu
-            while(chooseAddOrGenerate(stringGenerator));
+            while(chooseAddOrGenerate(sentenceGeneratorContext));
 
             // Return true to show the Generator selection prompt again
             return true;
@@ -95,7 +95,7 @@ class Menu {
     // or 2) Generate a new sentence
     // Return true if the user wants to try the generator again
     // Return false if the user wants to go back to the previous menu
-    static boolean chooseAddOrGenerate(StringGenerator stringGenerator){
+    static boolean chooseAddOrGenerate(SentenceGeneratorContext sentenceGeneratorContext){
         // Display the selection prompt
         for (int i = 1; i <= operations.length; i++) {
             System.out.printf("%d. %s\n", i, operations[i - 1]);
@@ -113,12 +113,12 @@ class Menu {
                 System.out.println("Please enter a word to be add to the vocabulary:");
                 sc.nextLine();
                 String word = sc.nextLine();
-                stringGenerator.executeVocabularyAddition(word);
+                sentenceGeneratorContext.executeVocabularyAddition(word);
             }
             // User wants to generate a sentence
             else if (operationID == 2) {
-                String sentence = stringGenerator.executeStringGeneration();
-                System.out.println(sentence);
+                String sentence = sentenceGeneratorContext.executeStringGeneration();
+                System.out.println("\"" + sentence + "\"\n");
             }
             // User wants to go back to the previous menu
             else if(operationID == 3){
@@ -143,7 +143,7 @@ class Menu {
 // It is responsible for executing the strategy on the client's request and
 // is not really aware of all the strategies available (RSG, SSG, OSG). Rather
 // the class operates on a common interface for all the strategies - Generator Strategy.
-class StringGenerator{
+class SentenceGeneratorContext {
     // To hold the strategy set by the client
     private GeneratorStrategy generatorStrategy;
 
@@ -162,7 +162,9 @@ class StringGenerator{
                throw new NullPointerException();
 
            return generatedSentence;
-       } catch (NullPointerException exception){
+       }
+       // If at any step before, null is returned or NullPointerException Occurs, they are caught here and an empty string is returned in that case
+       catch (NullPointerException exception){
            return "";
        }
     }
@@ -191,7 +193,6 @@ interface GeneratorStrategy{
 
     // Add the formatted word word to the vocabulary
     void addToVocabulary(String formattedWord);
-
 }
 
 /*
@@ -210,24 +211,26 @@ class RandomSentenceGenerator implements GeneratorStrategy{
     {
         ArrayList<String> vocabulary = getVocabulary();
 
-        // We want the the number range to be [1, total number of words] not [0, total number of words - 1]
-        // Max number words can be of 1.5x length of the vocabulary array
-        int numberOfWords = (int) ((Math.random()*100000000)%(vocabulary.size() + vocabulary.size()/2) ) + 1;
-
-        ArrayList<String> words = new ArrayList<>(numberOfWords);
-
         try {
+            // We want the the number range to be [1, total number of words] not [0, total number of words - 1]
+            // Max number words is assumed to be a Constant
+            int numberOfWords = (int) ((Math.random()*100)%(SentenceGenerator35.MAX_NUMBER_OF_WORDS) + 1);
+
+            ArrayList<String> words = new ArrayList<>(numberOfWords);
+
             for (int i = 0; i < numberOfWords; i++) {
                 int randomIndex = (int) ((Math.random() * 100000000) % vocabulary.size());
                 words.add(vocabulary.get(randomIndex));
             }
 
             return words;
-        } catch (IndexOutOfBoundsException exception){
+        }
+        // In case the vocabulary is empty or the index is out of bound, IndexOutOfBoundsException is thrown which is caught here
+        catch (IndexOutOfBoundsException exception){
             if(vocabulary.isEmpty())
-                System.out.println("Vocabulary is empty. Please try adding some words first. ");
+                System.out.println("RSG: Vocabulary is empty. Please try adding some words first.");
             else
-                System.out.println("Exception Occurred: Vocabulary index out of bound." + exception.getLocalizedMessage());
+                System.out.println("RSG: Exception Occurred: Vocabulary index out of bound. " + exception.getLocalizedMessage());
 
             return null;
         }
@@ -243,8 +246,10 @@ class RandomSentenceGenerator implements GeneratorStrategy{
             }
 
             return sentence;
-        } catch (IndexOutOfBoundsException exception){
-            System.out.println("Exception occurred: The word list array is empty! ");
+        }
+        // In case the word ArrayList is empty or the index is out of bound, IndexOutOfBoundsException is thrown which is caught here
+        catch (IndexOutOfBoundsException exception){
+            System.out.println("RSG: Exception occurred: The word list array is empty! ");
             return null;
         }
     }
@@ -284,12 +289,12 @@ class SortedSentenceGenerator implements GeneratorStrategy{
     public ArrayList<String> prepareWords() {
         ArrayList<String> vocabulary = getVocabulary();
 
-        // We want the the number range to be [1, total number of words] not [0, total number of words - 1]
-        // Max number words can be of 1.5x length of the vocabulary array
-        int numberOfWords = (int) ((Math.random()*100000000)%(vocabulary.size() + vocabulary.size()/2) ) + 1;
-        ArrayList<String> words = new ArrayList<>(numberOfWords);
-
         try {
+            // We want the the number range to be [1, total number of words] not [0, total number of words - 1]
+            // Max number words is assumed to be a Constant
+            int numberOfWords = (int) ((Math.random()*100)%(SentenceGenerator35.MAX_NUMBER_OF_WORDS) + 1);
+            ArrayList<String> words = new ArrayList<>(numberOfWords);
+
             for (int i = 0; i < numberOfWords; i++) {
                 int randomIndex = (int) ((Math.random() * 100000000) % vocabulary.size());
                 words.add(vocabulary.get(randomIndex));
@@ -299,11 +304,13 @@ class SortedSentenceGenerator implements GeneratorStrategy{
             Collections.sort(words);
 
             return words;
-        } catch (IndexOutOfBoundsException exception){
+        }
+        // In case the vocabulary is empty or the index is out of bound, IndexOutOfBoundsException is thrown which is caught here
+        catch (IndexOutOfBoundsException exception){
             if(vocabulary.isEmpty())
-                System.out.println("Vocabulary is empty. Please try adding some words first.");
+                System.out.println("SSG: Vocabulary is empty. Please try adding some words first.");
             else
-                System.out.println("Exception Occurred: Vocabulary index out of bound. " + exception.getLocalizedMessage());
+                System.out.println("SSG: Exception Occurred: Vocabulary index out of bound. " + exception.getLocalizedMessage());
 
             return null;
         }
@@ -319,8 +326,10 @@ class SortedSentenceGenerator implements GeneratorStrategy{
             }
 
             return sentence;
-        } catch (IndexOutOfBoundsException exception){
-            System.out.println("Exception occurred: The word list array is empty!");
+        }
+        // In case the word is empty or the index is out of bound, IndexOutOfBoundsException is thrown which is caught here
+        catch (IndexOutOfBoundsException exception){
+            System.out.println("SSG: Exception occurred: The word list array is empty!");
             return null;
         }
     }
@@ -361,16 +370,52 @@ class OrderedSentenceGenerator implements GeneratorStrategy{
     public ArrayList<String> prepareWords() {
         ArrayList<String> vocabulary = getVocabulary();
 
-        if(vocabulary.isEmpty()){
-            System.out.println("Vocabulary is empty. Please try adding some words first.");
+        try {
+            // We want the the number range to be [1, total number of words] not [0, total number of words - 1]
+
+            // Max possible number words is assumed to be a Constant
+            // Take the max possible number of words OR the size of the vocabulary - whichever smaller.
+            int currentWordLimit = Math.min(SentenceGenerator35.MAX_NUMBER_OF_WORDS, vocabulary.size());
+            int numberOfWords = (int) ( ((Math.random()*100) % currentWordLimit) + 1);
+
+            // Take the max possible number of words OR the size of the vocabulary - whichever smaller.
+            numberOfWords = Math.min(numberOfWords, vocabulary.size());
+
+            // Take all the indices of the vocabulary in an array first.
+            // Shuffle them
+            // Take the first "numberOfWords" numbers
+            // This ensures that the words are selected randomly
+            ArrayList<Integer> vocIndices = new ArrayList<>(vocabulary.size());
+            ArrayList<Integer> wordIndices = new ArrayList<>(numberOfWords);
+
+            for(int i=0; i<vocabulary.size(); i++)
+                vocIndices.add(i);
+            Collections.shuffle(vocIndices);
+            for(int i=0; i<numberOfWords; i++){
+                wordIndices.add(vocIndices.get(i));
+            }
+
+            // Sort the selected indices so that they are in the word they were inserted
+            Collections.sort(wordIndices);
+
+            ArrayList<String> words = new ArrayList<>(numberOfWords);
+
+            for(int i=0; i<numberOfWords; i++){
+                words.add(vocabulary.get(wordIndices.get(i)));
+            }
+
+            return words;
+        }
+        catch (IndexOutOfBoundsException exception){
+            if(vocabulary.isEmpty())
+                System.out.println("OSG: Vocabulary is empty. Please try adding some words first.");
+            else{
+                System.out.println(exception.getMessage());
+                System.out.println("OSG: Exception Occurred: Vocabulary index out of bound. " + exception.getLocalizedMessage());
+            }
 
             return null;
         }
-
-        // Return a deep copy of the vocabulary instead so that it cannot be altered outside this class
-        ArrayList<String> copyOfVocabulary = new ArrayList<>();
-        copyOfVocabulary.addAll(vocabulary);
-        return copyOfVocabulary;
     }
 
     // Concatenates the words generated by the prepareWords() method
@@ -383,8 +428,9 @@ class OrderedSentenceGenerator implements GeneratorStrategy{
             }
 
             return sentence;
+            // In case the word array is empty or the index is out of bound, IndexOutOfBoundsException is thrown which is caught here
         } catch (IndexOutOfBoundsException exception){
-            System.out.println("Exception occurred: The word list array is empty!");
+            System.out.println("OSG: Exception occurred: The word list array is empty!");
             return null;
         }
     }
